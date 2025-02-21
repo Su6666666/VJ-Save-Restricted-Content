@@ -1,43 +1,45 @@
-import motor.motor_asyncio
-from config import DB_NAME, DB_URI
-
 class Database:
-    
-    def __init__(self, uri, database_name):
-        self._client = motor.motor_asyncio.AsyncIOMotorClient(uri)
-        self.db = self._client[database_name]
-        self.col = self.db.users
+    def __init__(self):
+        # Using a dictionary to store users keyed by their id
+        self.users = {}
 
     def new_user(self, id, name):
-        return dict(
-            id = id,
-            name = name,
-            session = None,
-        )
-    
+        return {
+            "id": id,
+            "name": name,
+            "session": None,
+        }
+
     async def add_user(self, id, name):
-        user = self.new_user(id, name)
-        await self.col.insert_one(user)
-    
+        # Add or update the user in memory
+        self.users[id] = self.new_user(id, name)
+
     async def is_user_exist(self, id):
-        user = await self.col.find_one({'id':int(id)})
-        return bool(user)
-    
+        # Check if the user exists in the dictionary
+        return id in self.users
+
     async def total_users_count(self):
-        count = await self.col.count_documents({})
-        return count
+        # Return the total count of users stored in memory
+        return len(self.users)
 
     async def get_all_users(self):
-        return self.col.find({})
+        # Return a list of all user dictionaries
+        return list(self.users.values())
 
-    async def delete_user(self, user_id):
-        await self.col.delete_many({'id': int(user_id)})
+    async def delete_user(self, id):
+        # Remove the user from the dictionary if they exist
+        if id in self.users:
+            del self.users[id]
 
     async def set_session(self, id, session):
-        await self.col.update_one({'id': int(id)}, {'$set': {'session': session}})
+        # Update the session field for the user
+        if id in self.users:
+            self.users[id]['session'] = session
 
     async def get_session(self, id):
-        user = await self.col.find_one({'id': int(id)})
-        return user.get('session')
+        # Retrieve the session for the user if available
+        user = self.users.get(id)
+        return user.get("session") if user else None
 
-db = Database(DB_URI, DB_NAME)
+# Instantiate the database object for in-memory use
+db = Database()
