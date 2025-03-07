@@ -1,3 +1,3 @@
 OWNER = "@RDX9247"
-BOT_NAME = "@TestDrive786_Bot"
+BOT_NAME = "@Loda_Lahsun_bot"
 BOT_USERNAME = "@RDXttyz"
