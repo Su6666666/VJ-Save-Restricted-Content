@@ -1,3 +1,3 @@
-OWNER = "Your Name"
-BOT_NAME = "Your Bot Name"
-BOT_USERNAME = "Your Bot Username"
+OWNER = "@RDX9247"
+BOT_NAME = "@TestDrive786_Bot"
+BOT_USERNAME = "@RDXttyz"
