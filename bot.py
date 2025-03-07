@@ -33,6 +33,11 @@ Bot().run()
 
 from premium_membership import *
 
+bash
+git add .
+git commit -m "Added premium membership management feature"
+git push origin main
+
 # Don't Remove Credit Tg - @VJ_Botz
 # Subscribe YouTube Channel For Amazing Bot https://youtube.com/@Tech_VJ
 # Ask Doubt on telegram @KingVJ01
