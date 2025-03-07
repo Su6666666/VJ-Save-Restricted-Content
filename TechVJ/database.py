@@ -20,6 +20,7 @@ def is_premium(user_id):
     return cursor.fetchone() is not None
 
 
+#Modify database schema ko 5GB se jyada file ko store karne ke liye
 
 import sqlite3
 
