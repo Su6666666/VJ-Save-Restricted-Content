@@ -19,3 +19,20 @@ def is_premium(user_id):
     cursor.execute("SELECT * FROM premium_members WHERE user_id = ?", (user_id,))
     return cursor.fetchone() is not None
 
+
+
+import sqlite3
+
+conn = sqlite3.connect("database.db")
+cursor = conn.cursor()
+
+cursor.execute("""
+    CREATE TABLE IF NOT EXISTS files (
+        id INTEGER PRIMARY KEY,
+        file_id TEXT,
+        file_name TEXT,
+        file_size INTEGER
+    );
+""")
+
+conn.commit()
