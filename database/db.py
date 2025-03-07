@@ -41,3 +41,4 @@ class Database:
         return user.get('session')
 
 db = Database(DB_URI, DB_NAME)
+

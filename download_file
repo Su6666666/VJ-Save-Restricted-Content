@@ -1,0 +1,5 @@
+@app.on_message(filters.command("download") & filters.private)
+async def download_file(bot, message):
+    file_id = "your-file-id"
+    file_name = "your-file-name"
+    await bot.download_file(file_id, file_name)

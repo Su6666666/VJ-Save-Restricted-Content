@@ -1,0 +1,9 @@
+from pyrogram import Client
+
+app = Client(
+    "VJ-Save-Restricted-Content",
+    bot_token="your-bot-token",
+    api_id="your-api-id",
+    api_hash="your-api-hash",
+    chunk_size=1024 * 1024 * 50,  # 50MB chunk size
+)

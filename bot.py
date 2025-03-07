@@ -22,7 +22,7 @@ class Bot(Client):
     async def start(self):
             
         await super().start()
-        print('Bot Started Powered By @VJ_Botz')
+        print('Bot Started Powered By @AG_Botz')
 
     async def stop(self, *args):
 
@@ -30,6 +30,13 @@ class Bot(Client):
         print('Bot Stopped Bye')
 
 Bot().run()
+
+from premium_membership import *
+
+bash
+git add .
+git commit -m "Added premium membership management feature"
+git push origin main
 
 # Don't Remove Credit Tg - @VJ_Botz
 # Subscribe YouTube Channel For Amazing Bot https://youtube.com/@Tech_VJ
