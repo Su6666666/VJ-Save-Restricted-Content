@@ -90,4 +90,5 @@ https://t.me/c/xxxx/101-120
 ## 💡 Credits
 
 - Thanks to [BipinKrish](https://github.com/bipinkrish) for the base repository
+- Thanks to [Tech VJ](https://youtube.com/@tech_vj?feature=shared) for the original implementation and features
 - Modified and enhanced by Delta1
