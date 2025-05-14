@@ -13,6 +13,7 @@ class Database:
             id = id,
             name = name,
             session = None,
+            thumbnail_file_id = None
         )
     
     async def add_user(self, id, name):
@@ -39,5 +40,14 @@ class Database:
     async def get_session(self, id):
         user = await self.col.find_one({'id': int(id)})
         return user.get('session')
+
+    async def set_thumbnail(self, id, thumbnail_file_id):
+        await self.col.update_one({'id': int(id)}, {'$set': {'thumbnail_file_id': thumbnail_file_id}})
+
+    async def get_thumbnail(self, id):
+        user = await self.col.find_one({'id': int(id)})
+        if user:
+            return user.get('thumbnail_file_id')
+        return None
 
 db = Database(DB_URI, DB_NAME)

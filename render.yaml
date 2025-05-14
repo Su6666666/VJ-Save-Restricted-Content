@@ -1,0 +1,10 @@
+services:
+  - type: worker
+    name: imforwarder
+    env: python
+    pythonVersion: "3.10.8"
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "python3 bot.py"
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.10.8" 

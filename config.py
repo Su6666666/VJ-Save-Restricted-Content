@@ -19,3 +19,12 @@ DB_NAME = os.environ.get("DB_NAME", "vjsavecontentbot")
 
 # If You Want Error Message In Your Personal Message Then Turn It True Else If You Don't Want Then Flase
 ERROR_MESSAGE = bool(os.environ.get('ERROR_MESSAGE', True))
+
+# Words/phrases that will prevent a message from being forwarded. Case-insensitive.
+# Example: BLOCKED_WORDS = ["secret data", "confidential info", "banned term"]
+BLOCKED_WORDS = [] # Initialize as empty, admin should fill this via environment or direct edit
+
+# Attempt to get BLOCKED_WORDS from environment variable, expecting a comma-separated string
+BLOCKED_WORDS_ENV = os.environ.get("BLOCKED_WORDS", "")
+if BLOCKED_WORDS_ENV:
+    BLOCKED_WORDS = [word.strip().lower() for word in BLOCKED_WORDS_ENV.split(',')]

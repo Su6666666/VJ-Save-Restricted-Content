@@ -5,15 +5,17 @@
 import os
 import asyncio 
 import pyrogram
+import random # Added for random delays
 from pyrogram import Client, filters, enums
 from pyrogram.errors import FloodWait, UserIsBlocked, InputUserDeactivated, UserAlreadyParticipant, InviteHashExpired, UsernameNotOccupied
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, Message 
-from config import API_ID, API_HASH, ERROR_MESSAGE
+from config import API_ID, API_HASH, ERROR_MESSAGE, BLOCKED_WORDS
 from database.db import db
-from TechVJ.strings import HELP_TXT
+from core.strings import HELP_TXT
 
 class batch_temp(object):
     IS_BATCH = {}
+    MESSAGE_COUNT = {}
 
 async def downstatus(client, statusfile, message, chat):
     while True:
@@ -60,16 +62,11 @@ def progress(current, total, message, type):
 async def send_start(client: Client, message: Message):
     if not await db.is_user_exist(message.from_user.id):
         await db.add_user(message.from_user.id, message.from_user.first_name)
-    buttons = [[
-        InlineKeyboardButton("❣️ Developer", url = "https://t.me/kingvj01")
-    ],[
-        InlineKeyboardButton('🔍 sᴜᴘᴘᴏʀᴛ ɢʀᴏᴜᴘ', url='https://t.me/vj_bot_disscussion'),
-        InlineKeyboardButton('🤖 ᴜᴘᴅᴀᴛᴇ ᴄʜᴀɴɴᴇʟ', url='https://t.me/vj_botz')
-    ]]
-    reply_markup = InlineKeyboardMarkup(buttons)
+    buttons = []  # Removed all buttons
+    reply_markup = InlineKeyboardMarkup(buttons) if buttons else None # Handle empty buttons
     await client.send_message(
         chat_id=message.chat.id, 
-        text=f"<b>👋 Hi {message.from_user.mention}, I am Save Restricted Content Bot, I can send you restricted content by its post link.\n\nFor downloading restricted content /login first.\n\nKnow how to use bot by - /help</b>", 
+        text=f"<b>👋 Hello {message.from_user.mention}! I'm a bot that can help you save restricted content from Telegram posts. Use /help to see how to use my features. For some actions, you might need to /login first.</b>", 
         reply_markup=reply_markup, 
         reply_to_message_id=message.id
     )
@@ -88,6 +85,7 @@ async def send_help(client: Client, message: Message):
 @Client.on_message(filters.command(["cancel"]))
 async def send_cancel(client: Client, message: Message):
     batch_temp.IS_BATCH[message.from_user.id] = True
+    batch_temp.MESSAGE_COUNT[message.from_user.id] = 0
     await client.send_message(
         chat_id=message.chat.id, 
         text="**Batch Successfully Cancelled.**"
@@ -96,8 +94,9 @@ async def send_cancel(client: Client, message: Message):
 @Client.on_message(filters.text & filters.private)
 async def save(client: Client, message: Message):
     if "https://t.me/" in message.text:
-        if batch_temp.IS_BATCH.get(message.from_user.id) == False:
-            return await message.reply_text("**One Task Is Already Processing. Wait For Complete It. If You Want To Cancel This Task Then Use - /cancel**")
+        current_is_batch_status = batch_temp.IS_BATCH.get(message.from_user.id)
+        if current_is_batch_status == False:
+            return await message.reply_text("**One Task Is Already Processing. Wait For It To Complete. If You Want To Cancel This Task Then Use - /cancel**")
         datas = message.text.split("/")
         temp = datas[-1].replace("?single","").split("-")
         fromID = int(temp[0].strip())
@@ -106,6 +105,7 @@ async def save(client: Client, message: Message):
         except:
             toID = fromID
         batch_temp.IS_BATCH[message.from_user.id] = False
+        batch_temp.MESSAGE_COUNT[message.from_user.id] = 0
         for msgid in range(fromID, toID+1):
             if batch_temp.IS_BATCH.get(message.from_user.id): break
             user_data = await db.get_session(message.from_user.id)
@@ -156,9 +156,21 @@ async def save(client: Client, message: Message):
                         if ERROR_MESSAGE == True:
                             await client.send_message(message.chat.id, f"Error: {e}", reply_to_message_id=message.id)
 
-            # wait time
-            await asyncio.sleep(3)
+            # Increment message count for the batch
+            current_count = batch_temp.MESSAGE_COUNT.get(message.from_user.id, 0)
+            current_count += 1
+            batch_temp.MESSAGE_COUNT[message.from_user.id] = current_count
+
+            # Determine delay based on batch count
+            delay_seconds = 3 # Default delay
+            if 10 <= current_count <= 50:
+                delay_seconds = random.randint(1, 10) 
+            elif current_count > 50:
+                delay_seconds = random.randint(1, 30)
+            
+            await asyncio.sleep(delay_seconds)
         batch_temp.IS_BATCH[message.from_user.id] = True
+        batch_temp.MESSAGE_COUNT[message.from_user.id] = 0
 
 
 # handle private
@@ -167,8 +179,27 @@ async def handle_private(client: Client, acc, message: Message, chatid: int, msg
     if msg.empty: return 
     msg_type = get_message_type(msg)
     if not msg_type: return 
+
+    # Word Filter Check
+    content_to_check = ""
+    if msg.text:
+        content_to_check = msg.text.lower()
+    elif msg.caption:
+        content_to_check = msg.caption.lower()
+    
+    if content_to_check and BLOCKED_WORDS:
+        for blocked_word in BLOCKED_WORDS:
+            if blocked_word in content_to_check:
+                await client.send_message(message.chat.id, f"This message contains a blocked word/phrase ('{blocked_word}') and cannot be forwarded.", reply_to_message_id=message.id)
+                return # Stop processing this message
+
     chat = message.chat.id
     if batch_temp.IS_BATCH.get(message.from_user.id): return 
+
+    # Get user's custom thumbnail
+    user_thumb_id = await db.get_thumbnail(message.from_user.id)
+    ph_path = None # Initialize ph_path
+
     if "Text" == msg_type:
         try:
             await client.send_message(chat, msg.text, entities=msg.entities, reply_to_message_id=message.id, parse_mode=enums.ParseMode.HTML)
@@ -198,9 +229,12 @@ async def handle_private(client: Client, acc, message: Message, chatid: int, msg
             
     if "Document" == msg_type:
         try:
-            ph_path = await acc.download_media(msg.document.thumbs[0].file_id)
+            if user_thumb_id:
+                ph_path = await acc.download_media(user_thumb_id) # Download custom thumb if set
+            elif msg.document.thumbs and msg.document.thumbs[0].file_id:
+                ph_path = await acc.download_media(msg.document.thumbs[0].file_id) # Default thumb
         except:
-            ph_path = None
+            ph_path = None # Ensure ph_path is None if download fails
         
         try:
             await client.send_document(chat, file, thumb=ph_path, caption=caption, reply_to_message_id=message.id, parse_mode=enums.ParseMode.HTML, progress=progress, progress_args=[message,"up"])
@@ -212,7 +246,10 @@ async def handle_private(client: Client, acc, message: Message, chatid: int, msg
 
     elif "Video" == msg_type:
         try:
-            ph_path = await acc.download_media(msg.video.thumbs[0].file_id)
+            if user_thumb_id:
+                ph_path = await acc.download_media(user_thumb_id)
+            elif msg.video.thumbs and msg.video.thumbs[0].file_id:
+                ph_path = await acc.download_media(msg.video.thumbs[0].file_id)
         except:
             ph_path = None
         
@@ -246,7 +283,10 @@ async def handle_private(client: Client, acc, message: Message, chatid: int, msg
 
     elif "Audio" == msg_type:
         try:
-            ph_path = await acc.download_media(msg.audio.thumbs[0].file_id)
+            if user_thumb_id:
+                ph_path = await acc.download_media(user_thumb_id)
+            elif msg.audio.thumbs and msg.audio.thumbs[0].file_id:
+                ph_path = await acc.download_media(msg.audio.thumbs[0].file_id)
         except:
             ph_path = None
 
