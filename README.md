@@ -21,12 +21,30 @@
 
 ## Commands
 
-- `/start` : Check Bot Is Working Or Not
-- `/help` : Check How To Use Bot
-- `/login` : Login Your Telegram String Session 
-- `/logout` : Logout Your Session 
-- `/cancel` : Cancel Your Any Ongoing Task
-- `/broadcast` : Broadcast Message To User (Admin Only)
+
+- **`start`**: 🚀 Start the bot.
+- **`batch`**: ✌️ Extract in bulk.
+- **`login`**: 🔑 Get into the bot.
+- **`logout`**: 🚪 Get out of the bot.
+- **`token`**: 🎲 Get 3 hours of free access.
+- **`adl`**: 👻 Download audio from 30+ sites.
+- **`dl`**: 💀 Download videos from 30+ sites.
+- **`transfer`**: 💘 Gift premium to others.
+- **`myplan`**: ⌛ Get your plan details.
+- **`add`**: ➕ Add user to premium.
+- **`rem`**: ➖ Remove user from premium.
+- **`session`**: 🧵 Generate Pyrogramv2 session.
+- **`settings`**: ⚙️ Personalize settings.
+- **`stats`**: 📊 Get stats of the bot.
+- **`plan`**: 🗓️ Check our premium plans.
+- **`terms`**: 🥺 Terms and conditions.
+- **`speedtest`**: 🚅 Check the server speed.
+- **`get`**: 🗄️ Get all user IDs.
+- **`lock`**: 🔒 Protect channel from extraction.
+- **`gcast`**: ⚡ Broadcast message to bot users.
+- **`help`**: ❓ Help if you're new.
+- **`cancel`**: 🚫 Cancel batch process.
+
 
 ---
 
