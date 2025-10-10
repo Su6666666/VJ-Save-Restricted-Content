@@ -10,11 +10,13 @@
 
 ## Variables
 
+- `LOGIN_SYSTEM` : Set True or False As per your need.
+- `STRING_SESSION` : if login is False then this variable is compulsory to fill. ( ⚠️ Warning - Give string session on deploy website environment variable, don't give in repo )
 - `API_HASH` : Your API Hash From [Telegram Website](https://my.telegram.org)
 - `API_ID` : Your API ID From [Telegram Website](https://my.telegram.org)
-- `BOT_TOKEN` : Your Bot Token From [BotFather](https://telegram.me/BotFather)
+- `BOT_TOKEN` : Your Bot Token From [BotFather](https://telegram.me/BotFather) ( ⚠️ Warning - Give Bot Token on deploy website environment variable, don't give in repo )
 - `ADMINS` : Your Admin Id For Broadcasting Message
-- `DB_URI` : Your Mongodb Database Url From [Mongodb](https://mongodb.com) Watch [Video Tutorial](https://youtu.be/DAHRmFdw99o) ( Warning - Give Db uri in deploy server environment variable, don't give in repo )
+- `DB_URI` : Your Mongodb Database Url From [Mongodb](https://mongodb.com) Watch [Video Tutorial](https://youtu.be/DAHRmFdw99o) ( ⚠️ Warning - Give Db Url on deploy website environment variable, don't give in repo )
 - `ERROR_MESSAGE` : Set True Or False, If You Want Error Message Then True Else False.
 
 ---

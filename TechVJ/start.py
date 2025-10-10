@@ -8,9 +8,10 @@ import pyrogram
 from pyrogram import Client, filters, enums
 from pyrogram.errors import FloodWait, UserIsBlocked, InputUserDeactivated, UserAlreadyParticipant, InviteHashExpired, UsernameNotOccupied
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, Message 
-from config import API_ID, API_HASH, ERROR_MESSAGE
+from config import API_ID, API_HASH, ERROR_MESSAGE, LOGIN_SYSTEM, STRING_SESSION
 from database.db import db
 from TechVJ.strings import HELP_TXT
+from bot import TechVJUser
 
 class batch_temp(object):
     IS_BATCH = {}
@@ -95,6 +96,26 @@ async def send_cancel(client: Client, message: Message):
 
 @Client.on_message(filters.text & filters.private)
 async def save(client: Client, message: Message):
+    # joining chats
+	if ("https://t.me/+" in message.text or "https://t.me/joinchat/" in message.text) and LOGIN_SYSTEM == False:
+
+		if TechVJUser is None:
+			await client.send_message(message.chat.id,f"**String Session is not Set**", reply_to_message_id=message.id)
+			return
+
+		try:
+			try:
+                TechVJUser.join_chat(message.text)
+			except Exception as e: 
+				await client.send_message(message.chat.id,f"**Error** : __{e}__", reply_to_message_id=message.id)
+				return
+			await client.send_message(message.chat.id,"**Chat Joined**", reply_to_message_id=message.id)
+		except UserAlreadyParticipant:
+			await client.send_message(message.chat.id,"**Chat alredy Joined**", reply_to_message_id=message.id)
+		except InviteHashExpired:
+			await client.send_message(message.chat.id,"**Invalid Link**", reply_to_message_id=message.id)
+
+    
     if "https://t.me/" in message.text:
         if batch_temp.IS_BATCH.get(message.from_user.id) == False:
             return await message.reply_text("**One Task Is Already Processing. Wait For Complete It. If You Want To Cancel This Task Then Use - /cancel**")
@@ -108,17 +129,24 @@ async def save(client: Client, message: Message):
         batch_temp.IS_BATCH[message.from_user.id] = False
         for msgid in range(fromID, toID+1):
             if batch_temp.IS_BATCH.get(message.from_user.id): break
-            user_data = await db.get_session(message.from_user.id)
-            if user_data is None:
-                await message.reply("**For Downloading Restricted Content You Have To /login First.**")
-                batch_temp.IS_BATCH[message.from_user.id] = True
-                return
-            try:
-                acc = Client("saverestricted", session_string=user_data, api_hash=API_HASH, api_id=API_ID)
-                await acc.connect()
-            except:
-                batch_temp.IS_BATCH[message.from_user.id] = True
-                return await message.reply("**Your Login Session Expired. So /logout First Then Login Again By - /login**")
+            if LOGIN_SYSTEM == True:
+                user_data = await db.get_session(message.from_user.id)
+                if user_data is None:
+                    await message.reply("**For Downloading Restricted Content You Have To /login First.**")
+                    batch_temp.IS_BATCH[message.from_user.id] = True
+                    return
+                try:
+                    acc = Client("saverestricted", session_string=user_data, api_hash=API_HASH, api_id=API_ID)
+                    await acc.start()
+                except:
+                    batch_temp.IS_BATCH[message.from_user.id] = True
+                    return await message.reply("**Your Login Session Expired. So /logout First Then Login Again By - /login**")
+            else:
+                if TechVJUser is None:
+                    batch_temp.IS_BATCH[message.from_user.id] = True
+					await client.send_message(message.chat.id, f"**String Session is not Set**", reply_to_message_id=message.id)
+					return
+                acc = TechVJUser
             
             # private
             if "https://t.me/c/" in message.text:
