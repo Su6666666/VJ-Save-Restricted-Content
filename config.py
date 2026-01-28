@@ -17,13 +17,13 @@ else:
 BOT_TOKEN = os.environ.get("BOT_TOKEN", "")
 
 # Your API ID from my.telegram.org
-API_ID = int(os.environ.get("API_ID", ""))
+API_ID = int(os.environ.get("7968810957"))
 
 # Your API Hash from my.telegram.org
-API_HASH = os.environ.get("API_HASH", "")
+API_HASH = os.environ.get("AAG7pmWaJachXQr91nevuz8b1EGtKOQoIqc")
 
 # Your Owner / Admin Id For Broadcast 
-ADMINS = int(os.environ.get("ADMINS", "6073523936"))
+ADMINS = int(os.environ.get("mongodb+srv://varunrajput77_db_user:eHLB6SmspUzYgv7o@cluster0.9lmur60.mongodb.net/?appName=Cluster0"))
 
 # Your Channel Id In Which Bot Upload Downloaded Video/File/Message etc.
 # And Make Your Bot Admin In this channel with full rights.
